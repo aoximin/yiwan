@@ -27,7 +27,7 @@ namespace BillionHelp
 
         private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            DialogResult d = MessageBox.Show("确定要回滚当前信息吗 ?", "确定");
+            DialogResult d = MessageBox.Show("确定要回滚当前信息吗 ?", "确定", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             int index = listBox1.IndexFromPoint(e.Location);
             var record = backUps[index];
             if (d == DialogResult.OK)
@@ -38,8 +38,8 @@ namespace BillionHelp
                 {
                     fileinfo.CopyTo(Form1.GamePath + "/Saves" + "/" + fileinfo.Name, true);
                 }
+                MessageBox.Show("已经回滚到" + record + "该时间点!");
             }
-            MessageBox.Show("已经回滚到"+record+"该时间点!");
         }
 
         private void Detail_Load(object sender, EventArgs e)

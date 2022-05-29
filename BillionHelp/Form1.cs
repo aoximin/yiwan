@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
+using TRBTools;
 using static System.Windows.Forms.ListBox;
 
 namespace BillionHelp
@@ -15,11 +17,49 @@ namespace BillionHelp
         DirectoryInfo configDir = new DirectoryInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/yiwanfuzhu");
         FileInfo configFile = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/yiwanfuzhu" + "/config.json");
         List<string> backupFileExtensions = new List<string> { ".zxcampaign", ".zxcheck", ".zxsav", "_Backup.zxcheck", "_Backup.zxsav", "~.zxcampaign", "~.zxcheck" };
-        int IntervalTime = 2;
+        int IntervalTime = 10;
         Config config;
         public Form1()
         {
             InitializeComponent();
+            Data.form1 = this;
+            Data.hotKeys.Add(Keys.F3, 3);// 保存
+            Data.hotKeys.Add(Keys.F8, 8);// 连点器
+            Data.hotKeys.Add(Keys.F6, 6);// 全图
+            Data.hotKeys.Add(Keys.F1, 1);// 显血
+            Data.hotKeys.Add(Keys.F7, 7);// 打开存档文件夹
+            Tools.HotKey(this.Handle, true);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
+                case 0x0312:
+                    if (m.WParam.ToInt32() == 3)
+                    {
+                        backUp();
+                    }
+                    //else if (m.WParam.ToInt32() == 8)
+                    //{
+                    //    MouseLeftClick.Run();
+                    //}
+                    //else if (m.WParam.ToInt32() == 6)
+                    //{
+                    //    new ShowMap().Run();
+                    //}
+                    //else if (m.WParam.ToInt32() == 1)
+                    //{
+                    //    ShowBlood.Run();
+                    //}
+                    //else if (m.WParam.ToInt32() == 7)
+                    //{
+                    //    string path = Tools.SavePath();
+                    //    System.Diagnostics.Process.Start(path);
+                    //}
+                    break;
+            }
+            base.WndProc(ref m);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -137,10 +177,21 @@ namespace BillionHelp
         private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             int index = listBox1.IndexFromPoint(e.Location);
+            if (index<0)
+            {
+                return;
+            }
             var item = gameInstances[index];
             Detail detail = new Detail();
             detail.gameInstance = item;
-            detail.ShowDialog();
+            try
+            {
+                detail.ShowDialog();
+            }
+            catch (Exception ex)
+            { 
+            }
+            
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -148,7 +199,33 @@ namespace BillionHelp
             backUp();
         }
 
+        public delegate void SetTextBoxValue(String str);
+
+        public void SetTextBox1Value(string log)
+        {
+           
+            if (this.label3.InvokeRequired)
+            {
+                SetTextBoxValue objSetTextBoxValue = new SetTextBoxValue(SetTextBox1Value);
+                IAsyncResult result = this.label3.BeginInvoke(objSetTextBoxValue, new object[] { log });
+                try
+                {
+                    objSetTextBoxValue.EndInvoke(result);
+                }
+                catch { }
+            }
+            else
+            {
+                label3.Text = log;
+            }
+        }
+
         private void backUp()
+        {
+            AutoSave.Run();
+        }
+
+        public void storeRecord()
         {
             DirectoryInfo dir = new DirectoryInfo(GamePath + "/Saves");
 
@@ -197,7 +274,7 @@ namespace BillionHelp
 
                     if (backupRecord.Contains(record))
                     {
-                        return;
+                        continue;
                     }
 
                     DirectoryInfo currentBackupDir = new DirectoryInfo(GamePath + "/Saves/back/" + item + "/" + record);
@@ -220,7 +297,6 @@ namespace BillionHelp
         private void button2_Click(object sender, EventArgs e)
         {
             backUp();
-            MessageBox.Show("备份成功!");
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -273,7 +349,21 @@ namespace BillionHelp
                 timer1.Stop();
                 timer1.Start();
             }
-            MessageBox.Show("修改定时备份成功");
+            MessageBox.Show("修改定时备份成功!");
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string path = Path.Combine(System.Environment.CurrentDirectory, "shangta.exe");
+            //打开进程
+            System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(path);
+            info.WorkingDirectory = Path.GetDirectoryName(path);
+            System.Diagnostics.Process.Start(info);
         }
     }
 }

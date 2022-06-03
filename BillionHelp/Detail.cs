@@ -29,8 +29,12 @@ namespace BillionHelp
         {
             DialogResult d = MessageBox.Show("确定要回滚当前信息吗 ?", "确定", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             int index = listBox1.IndexFromPoint(e.Location);
+            if (index<0)
+            {
+                return;
+            }
             var record = backUps[index];
-            if (d == DialogResult.OK)
+            if (d == DialogResult.Yes)
             {
                 DirectoryInfo currentBackupDir = new DirectoryInfo( Form1.GamePath + "/Saves/back/" + gameInstance + "/" + record);
                 var fileInfos = currentBackupDir.GetFiles();

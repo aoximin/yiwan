@@ -5,6 +5,18 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Thomas Wayne.ico</ApplicationIcon>
+    <SignAssembly>false</SignAssembly>
+    <Product>亿万辅助</Product>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageId>billionHelp</PackageId>
+    <Nullable>warnings</Nullable>
+    <Company>billionHelp</Company>
+    <Authors>billionHelp</Authors>
+    <AssemblyName>亿万辅助</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>

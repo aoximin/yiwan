@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BillionHelp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,9 @@ namespace TRBTools
             0x5E,
             0xC3,
         };
-        private Form form1;
-        private double speed;
-        public Speed(Form form1,double speed)
+        private Form1 form1;
+        public double speed;
+        public Speed(Form1 form1,double speed)
         {
             this.form1 = form1;
             this.speed = speed;
@@ -33,15 +34,15 @@ namespace TRBTools
             IntPtr funCodeAddress = tools.GetFunAdderssBySearchCode(funCode);
             if(funCodeAddress == IntPtr.Zero)
             {
-                tools.Log("定位函数失败");
-                //form1.SetTextBox1Value("速度:" + tools.log);
+                tools.Log("检测自己是否打开游戏");
+                form1.SetTextBox1Value("速度:" + tools.log);
                 return;
             }
             int injectSucessSize = tools.InjectCode(funCodeAddress+0x28, BitConverter.GetBytes(speed));
             if (injectSucessSize != 8)
             {
-                tools.Log("注入代码失败");
-                //form1.SetTextBox1Value("速度:" + tools.log);
+                tools.Log("注入代码失败,请关闭安全控件!");
+                form1.SetTextBox1Value("速度:" + tools.log);
             }
         }
     }

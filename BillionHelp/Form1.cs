@@ -18,16 +18,19 @@ namespace BillionHelp
         FileInfo configFile = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/yiwanfuzhu" + "/config.json");
         List<string> backupFileExtensions = new List<string> { ".zxcampaign", ".zxcheck", ".zxsav", "_Backup.zxcheck", "_Backup.zxsav", "~.zxcampaign", "~.zxcheck" };
         int IntervalTime = 10;
+        int speed = 1;
+        Speed speedObj;
         Config config;
         public Form1()
         {
             InitializeComponent();
+            speedObj = new Speed(this, 1);
             Data.form1 = this;
             Data.hotKeys.Add(Keys.F3, 3);// 保存
             Data.hotKeys.Add(Keys.F8, 8);// 连点器
-            Data.hotKeys.Add(Keys.F6, 6);// 全图
-            Data.hotKeys.Add(Keys.F1, 1);// 显血
-            Data.hotKeys.Add(Keys.F7, 7);// 打开存档文件夹
+            //Data.hotKeys.Add(Keys.F6, 6);// 全图
+            //Data.hotKeys.Add(Keys.F1, 1);// 显血
+            //Data.hotKeys.Add(Keys.F7, 7);// 打开存档文件夹
             Tools.HotKey(this.Handle, true);
         }
 
@@ -130,6 +133,14 @@ namespace BillionHelp
             // 显示定时时间
             textBox1.Text = IntervalTime.ToString();
             label1.Text = GamePath;
+            try
+            {
+                httpHelp.HttpService("http://114.132.242.30/login", null, "get");
+            }
+            catch
+            { 
+                // nothing
+            }
         }
 
         private void loadBackup(DirectoryInfo dir2)
@@ -364,6 +375,18 @@ namespace BillionHelp
             System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(path);
             info.WorkingDirectory = Path.GetDirectoryName(path);
             System.Diagnostics.Process.Start(info);
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            speed = trackBar1.Value;
+            label5.Text = speed.ToString();
+        }
+
+        private void 确认加速_Click(object sender, EventArgs e)
+        {
+            speedObj.speed = speed;
+            speedObj.Run();
         }
     }
 }

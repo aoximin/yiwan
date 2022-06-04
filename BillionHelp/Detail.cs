@@ -57,15 +57,43 @@ namespace BillionHelp
             Form1.GameBackups.TryGetValue(gameInstance, out backUps);
             if (backUps != null)
             {
-                ObjectCollection objectCollection = new ObjectCollection(listBox1);
-                objectCollection.Clear();
-                objectCollection.AddRange(backUps.ToArray());
+                //ObjectCollection objectCollection = new ObjectCollection(listBox1);
+                //objectCollection.Clear();
+                //objectCollection.AddRange(backUps.ToArray());
+                listBox1.Items.Clear();
+                foreach (var item in backUps)
+                {
+                    listBox1.Items.Add(item);
+                }
             }
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        public void removeRecord(string gameInstance, string time)
+        {
+            var path = BillionHelp.Form1.GamePath+"/Saves/back" + "/" + gameInstance + "/" + time;
+            DirectoryInfo directoryInfo = new DirectoryInfo(path);
+            if (directoryInfo.Exists)
+            {
+                directoryInfo.Delete(true);
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //this.listBox1.SelectedItems.Clear();
+
+            var data = listBox1.SelectedItems;
+            foreach (var item in listBox1.SelectedItems)
+            {
+                removeRecord(gameInstance,(string)item);
+            }
+            Form1.FreshInstanceGame(gameInstance);
+            Fresh();
         }
     }
 }

@@ -12,7 +12,7 @@
     <Nullable>warnings</Nullable>
     <Company>billionHelp</Company>
     <Authors>billionHelp</Authors>
-    <AssemblyName>亿万辅助</AssemblyName>
+    <AssemblyName>BillionHelp</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,13 +20,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="shangta.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="shangta.exe">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="shangta.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Thomas Wayne.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

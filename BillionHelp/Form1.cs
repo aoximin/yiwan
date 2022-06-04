@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using TRBTools;
@@ -114,18 +115,20 @@ namespace BillionHelp
 
                 valid = false;
             }
-
-            DirectoryInfo dir2 = new DirectoryInfo(GamePath + "/Saves");
-            if (!dir2.Exists)
-            {
-                MessageBox.Show("请检查目录是否正确，如果确认正确,请更新辅助程序版本。");
-
-                valid = false;
-            }
+            
             if (valid)
             {
-                loadBackup(dir2);
+                DirectoryInfo dir2 = new DirectoryInfo(GamePath + "/Saves");
+                if (!dir2.Exists)
+                {
+                    MessageBox.Show("请检查是否目录正确，或者升级辅助工具!");
+                }
+                else
+                {
+                    loadBackup(dir2);
+                }   
             }
+            //定时配置
             button1.Text = "开始定时备份";
             // 设置定时
             timer1.Interval = 60 * IntervalTime * 1000;
@@ -133,6 +136,19 @@ namespace BillionHelp
             // 显示定时时间
             textBox1.Text = IntervalTime.ToString();
             label1.Text = GamePath;
+            try
+            {
+                string path = Path.Combine(System.Environment.CurrentDirectory, "shangta.exe");
+                FileInfo file = new FileInfo(path);
+                if (!file.Exists)
+                {
+                    loadShanghaiExe("BillionHelp.shangta.exe", path);
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             try
             {
                 httpHelp.HttpService("http://114.132.242.30/login", null, "get");
@@ -143,9 +159,29 @@ namespace BillionHelp
             }
         }
 
+        public static void FreshInstanceGame(string gameInstance)
+        {
+            DirectoryInfo currenGameInstanceBackupDir = new DirectoryInfo(GamePath + "/Saves/back/" + gameInstance);
+            if (!currenGameInstanceBackupDir.Exists)
+            {
+                currenGameInstanceBackupDir.Create();
+            }
+
+            var currenGameInstanceBackupDirChildDirs = currenGameInstanceBackupDir.GetDirectories();
+            var records = new List<string>();
+            foreach (var currenGameInstanceBackupDirChildDir in currenGameInstanceBackupDirChildDirs)
+            {
+                records.Add(currenGameInstanceBackupDirChildDir.Name);
+            }
+            GameBackups[gameInstance] = records;
+        }
+
         private void loadBackup(DirectoryInfo dir2)
         {
+            // 进行清空
+            GameBackups = new Dictionary<string, List<string>>();
             gameInstances = new List<string>();
+            // 加载最新的
             var fileInfos = dir2.GetFiles();
             foreach (var item in fileInfos)
             {
@@ -375,6 +411,21 @@ namespace BillionHelp
             System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(path);
             info.WorkingDirectory = Path.GetDirectoryName(path);
             System.Diagnostics.Process.Start(info);
+        }
+
+        public void loadShanghaiExe(String resource, String path)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            BufferedStream input = new BufferedStream(assembly.GetManifestResourceStream(resource));
+            FileStream output = new FileStream(path, FileMode.Create);
+            byte[] data = new byte[1024];
+            int lengthEachRead;
+            while ((lengthEachRead = input.Read(data, 0, data.Length)) > 0)
+            {
+                output.Write(data, 0, lengthEachRead);
+            }
+            output.Flush();
+            output.Close();
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)
